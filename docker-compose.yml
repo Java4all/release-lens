@@ -1,0 +1,10 @@
+services:
+  release-intel:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        VITE_ANTHROPIC_API_KEY: ${VITE_ANTHROPIC_API_KEY}
+    ports:
+      - "4173:4173"
+    restart: unless-stopped
