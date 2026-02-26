@@ -577,6 +577,9 @@ export default function ReleaseLens() {
   const [fileName, setFileName]     = useState("");
   const [docTitle, setDocTitle]      = useState({ title: "", subtitle: "", revision: "" });
   const [selectedScopes, setSelectedScopes] = useState(new Set(["new_features","deprecated","deployment_changes"]));
+  const [customScopes, setCustomScopes]     = useState([]);         // [{ id, label, color, icon }]
+  const [showCustomInput, setShowCustomInput] = useState(false);
+  const [customInputVal, setCustomInputVal]   = useState("");
 
   // Analysis state
   const [analysisPhase, setAnalysisPhase]       = useState("");
@@ -637,11 +640,27 @@ export default function ReleaseLens() {
     e.currentTarget.style.color = "rgba(167,139,250,0.85)";
   };
 
-  const scopeList = [...selectedScopes]
-    .map(id => ANALYSIS_SCOPES.find(s => s.id === id))
-    .filter(Boolean);
+  const CUSTOM_COLORS = ["#F59E0B","#10B981","#EC4899","#8B5CF6","#06B6D4","#EF4444","#84CC16","#F97316"];
+  const CUSTOM_ICONS  = ["◈","◉","◎","⬟","⬠","◇","⬡","◆"];
 
-  const canRun = (file || urlInput.trim()) && selectedScopes.size > 0;
+  const scopeList = [
+    ...[...selectedScopes].map(id => ANALYSIS_SCOPES.find(s => s.id === id)).filter(Boolean),
+    ...customScopes,
+  ];
+
+  const canRun = (file || urlInput.trim()) && (selectedScopes.size > 0 || customScopes.length > 0);
+
+  const addCustomScope = () => {
+    const label = customInputVal.trim();
+    if (!label) return;
+    const idx = customScopes.length % CUSTOM_COLORS.length;
+    const id = "custom_" + Date.now();
+    setCustomScopes(prev => [...prev, { id, label, color: CUSTOM_COLORS[idx], icon: CUSTOM_ICONS[idx] }]);
+    setCustomInputVal("");
+    setShowCustomInput(false);
+  };
+
+  const removeCustomScope = (id) => setCustomScopes(prev => prev.filter(s => s.id !== id));
 
   const toggleScope = id => setSelectedScopes(prev => {
     const next = new Set(prev);
@@ -655,6 +674,7 @@ export default function ReleaseLens() {
     setSelectedScopes(new Set(["new_features","deprecated","deployment_changes"]));
     setResultMap({}); setStreamingId(null); setActiveScopeId(null);
     setTotalFindings(0); setError(null); setAnalysisProgress(0); setCurrentScopeIdx(0);
+    setCustomScopes([]); setShowCustomInput(false); setCustomInputVal("");
     // Note: customTemplate is intentionally preserved across resets
   };
 
@@ -689,12 +709,17 @@ export default function ReleaseLens() {
   };
 
     const callClaudeWithText = async (scopeId, textContent, signal) => {
+    const isCustom = scopeId.startsWith("custom_");
+    const customLabel = isCustom ? (scopeList.find(s => s.id === scopeId)?.label || scopeId) : null;
+    const scopeInstruction = isCustom
+      ? `Extract all findings specifically related to: "${customLabel}". For each finding, provide a specific, actionable observation with full technical context relevant to this topic. Focus only on content directly relevant to "${customLabel}".`
+      : SCOPE_PROMPTS[scopeId];
     const systemPrompt = `You are a senior technical release analyst specialising in vendor documentation.
 Extract precise, actionable findings from vendor documentation.
 Respond ONLY with a numbered list (one finding per line, starting with number and period).
 Each finding: one complete sentence, 15-45 words, specific and technical.
 No headers, no preamble, no summary - only numbered findings.
-Scope: ${SCOPE_PROMPTS[scopeId]}`;
+Scope: ${scopeInstruction}`;
 
     let resp, lastErr;
     for (let attempt = 0; attempt < 4; attempt++) {
@@ -1017,7 +1042,7 @@ Scope: ${SCOPE_PROMPTS[scopeId]}`;
               <div style={{ background:"rgba(255,255,255,0.028)",border:"1px solid rgba(255,255,255,0.08)",borderRadius:16,padding:28,marginBottom:22 }}>
                 <div style={{ display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:16 }}>
                   <div style={{ fontSize:11,fontWeight:600,color:"rgba(255,255,255,0.38)",letterSpacing:"0.1em",textTransform:"uppercase",fontFamily:"'JetBrains Mono',monospace" }}>02 — Analysis Scope</div>
-                  <span style={{ fontSize:11,color:"rgba(255,255,255,0.28)" }}>{selectedScopes.size} selected</span>
+                  <span style={{ fontSize:11,color:"rgba(255,255,255,0.28)" }}>{scopeList.length} selected</span>
                 </div>
                 <div style={{ display:"grid",gridTemplateColumns:"1fr 1fr",gap:8 }}>
                   {ANALYSIS_SCOPES.map(scope => {
@@ -1035,6 +1060,50 @@ Scope: ${SCOPE_PROMPTS[scopeId]}`;
                       </div>
                     );
                   })}
+                  {/* Custom scope cards */}
+                  {customScopes.map(scope => (
+                    <div key={scope.id} className="scope-card" style={{ display:"flex",alignItems:"center",gap:10,padding:"10px 12px",borderRadius:9,cursor:"default",
+                      border:`1px solid ${scope.color}55`,background:`${scope.color}0e`,position:"relative" }}>
+                      <div style={{ width:28,height:28,borderRadius:6,flexShrink:0,display:"flex",alignItems:"center",justifyContent:"center",fontSize:13,
+                        background:`${scope.color}22`,border:`1px solid ${scope.color}55`,color:scope.color }}>{scope.icon}</div>
+                      <span style={{ fontSize:12,fontWeight:600,color:"rgba(255,255,255,0.88)",lineHeight:1.3,flex:1,minWidth:0,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap" }}>{scope.label}</span>
+                      <button onClick={()=>removeCustomScope(scope.id)}
+                        style={{ flexShrink:0,width:18,height:18,borderRadius:"50%",border:"none",background:"rgba(255,255,255,0.1)",color:"rgba(255,255,255,0.5)",cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",fontSize:11,lineHeight:1,padding:0,transition:"all 0.15s" }}
+                        onMouseEnter={e=>{e.currentTarget.style.background="rgba(239,68,68,0.3)";e.currentTarget.style.color="#FCA5A5";}}
+                        onMouseLeave={e=>{e.currentTarget.style.background="rgba(255,255,255,0.1)";e.currentTarget.style.color="rgba(255,255,255,0.5)";}}>✕</button>
+                    </div>
+                  ))}
+                </div>
+                {/* Add custom scope row */}
+                <div style={{ marginTop:10 }}>
+                  {showCustomInput ? (
+                    <div style={{ display:"flex",gap:7,alignItems:"center" }}>
+                      <input
+                        autoFocus
+                        value={customInputVal}
+                        onChange={e=>setCustomInputVal(e.target.value)}
+                        onKeyDown={e=>{if(e.key==="Enter")addCustomScope();if(e.key==="Escape"){setShowCustomInput(false);setCustomInputVal("");}}}
+                        placeholder="e.g. Performance improvements, API changes…"
+                        style={{ flex:1,background:"rgba(255,255,255,0.05)",border:"1px solid rgba(0,212,255,0.4)",borderRadius:8,padding:"8px 13px",fontSize:12,color:"rgba(255,255,255,0.88)",fontFamily:"'JetBrains Mono',monospace",outline:"none",caretColor:"#00D4FF" }}
+                      />
+                      <button onClick={addCustomScope} disabled={!customInputVal.trim()}
+                        style={{ padding:"8px 15px",borderRadius:8,border:"1px solid rgba(0,212,255,0.5)",background:"rgba(0,212,255,0.12)",color:"#00D4FF",fontSize:12,fontFamily:"'JetBrains Mono',monospace",fontWeight:600,cursor:customInputVal.trim()?"pointer":"default",opacity:customInputVal.trim()?1:0.4,transition:"all 0.15s" }}>
+                        Add
+                      </button>
+                      <button onClick={()=>{setShowCustomInput(false);setCustomInputVal("");}}
+                        style={{ padding:"8px 12px",borderRadius:8,border:"1px solid rgba(255,255,255,0.1)",background:"transparent",color:"rgba(255,255,255,0.35)",fontSize:12,cursor:"pointer" }}>
+                        Cancel
+                      </button>
+                    </div>
+                  ) : (
+                    <button onClick={()=>setShowCustomInput(true)}
+                      style={{ display:"flex",alignItems:"center",gap:6,padding:"7px 14px",borderRadius:8,border:"1px dashed rgba(255,255,255,0.15)",background:"transparent",color:"rgba(255,255,255,0.3)",fontSize:12,fontFamily:"'JetBrains Mono',monospace",cursor:"pointer",transition:"all 0.15s",width:"100%" }}
+                      onMouseEnter={e=>{e.currentTarget.style.borderColor="rgba(0,212,255,0.4)";e.currentTarget.style.color="rgba(0,212,255,0.8)";e.currentTarget.style.background="rgba(0,212,255,0.04)";}}
+                      onMouseLeave={e=>{e.currentTarget.style.borderColor="rgba(255,255,255,0.15)";e.currentTarget.style.color="rgba(255,255,255,0.3)";e.currentTarget.style.background="transparent";}}>
+                      <span style={{ fontSize:16,lineHeight:1,marginTop:-1 }}>+</span>
+                      <span>Add custom scope</span>
+                    </button>
+                  )}
                 </div>
               </div>
 
