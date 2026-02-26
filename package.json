@@ -11,7 +11,8 @@
   "dependencies": {
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "docx": "^8.5.0"
+    "docx": "^8.5.0",
+    "jszip": "^3.10.1"
   },
   "devDependencies": {
     "@types/react": "^18.3.1",
