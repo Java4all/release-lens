@@ -30,9 +30,9 @@ const SCOPE_PROMPTS = {
 };
 
 const SAMPLE_HISTORY = [
-  { id: 1, title: "Dell DAP 1.x Deployment Guide",    date: "Feb 2026", scopes: ["New & Changed Features", "Deprecated Features", "Deployment Changes"] },
-  { id: 2, title: "VMware vSphere 8.0 Release Notes", date: "Jan 2026", scopes: ["Breaking Changes", "Security & Compliance"] },
-  { id: 3, title: "Kubernetes 1.30 Migration Guide",  date: "Dec 2025", scopes: ["Migration Guide", "Deprecated Features"] },
+  { id: 1, title: "Dell DAP 1.x Deployment Guide",    date: "Feb 2026", url: "https://www.dell.com/support/kbdoc/en-us/000224359/dell-apex-software-platform-deployment-guide", scopes: ["New & Changed Features", "Deprecated Features", "Deployment Changes"] },
+  { id: 2, title: "VMware vSphere 8.0 Release Notes", date: "Jan 2026", url: "https://docs.vmware.com/en/VMware-vSphere/8.0/rn/vmware-vsphere-80-release-notes/index.html", scopes: ["Breaking Changes", "Security & Compliance"] },
+  { id: 3, title: "Kubernetes 1.30 Migration Guide",  date: "Dec 2025", url: "https://kubernetes.io/docs/concepts/overview/kubernetes-api/#api-versioning", scopes: ["Migration Guide", "Deprecated Features"] },
 ];
 
 // ─── Utilities ────────────────────────────────────────────────────────────────
@@ -921,8 +921,7 @@ Scope: ${scopeInstruction}`;
         .scope-card{transition:all 0.18s ease}
         .btn-glow:hover{transform:translateY(-2px);box-shadow:0 10px 36px rgba(0,212,255,0.3)!important}
         .btn-glow{transition:all 0.2s ease}
-        .hist:hover{background:rgba(255,255,255,0.04)!important}
-        .hist{transition:background 0.15s ease}
+
         .tab-btn{transition:all 0.15s ease}
         .tab-btn:hover{opacity:1!important}
         .exp-btn:hover{background:rgba(0,212,255,0.14)!important}
@@ -935,15 +934,29 @@ Scope: ${scopeInstruction}`;
       <div style={{ position:"fixed",bottom:-200,right:-100,width:520,height:520,borderRadius:"50%",pointerEvents:"none",zIndex:0, background:"radial-gradient(circle,rgba(167,139,250,0.06) 0%,transparent 70%)" }} />
 
       {/* ── TOP BAR ── */}
-      <div style={{ position:"relative",zIndex:10,display:"flex",alignItems:"center",justifyContent:"space-between",padding:"13px 28px",borderBottom:"1px solid rgba(255,255,255,0.06)",background:"rgba(7,11,20,0.85)",backdropFilter:"blur(20px)" }}>
+      <div style={{ position:"relative",zIndex:10,display:"grid",gridTemplateColumns:"1fr auto 1fr",alignItems:"center",padding:"16px 36px",borderBottom:"1px solid rgba(255,255,255,0.06)",background:"rgba(7,11,20,0.85)",backdropFilter:"blur(20px)" }}>
+        {/* Left: Logo */}
         <div style={{ display:"flex",alignItems:"center",gap:12 }}>
-          <div style={{ width:34,height:34,borderRadius:9,background:"linear-gradient(135deg,#00D4FF,#0055FF)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:18,color:"#000",fontWeight:800 }}>⟐</div>
+          <div style={{ width:42,height:42,borderRadius:11,background:"linear-gradient(135deg,#00D4FF,#0055FF)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:22,color:"#000",fontWeight:800 }}>⟐</div>
           <div>
-            <div style={{ fontFamily:"'Syne',sans-serif",fontSize:16,fontWeight:800,letterSpacing:"-0.02em" }}>Release<span style={{ color:"#00D4FF" }}>Lens</span></div>
-            <div style={{ fontSize:10,color:"rgba(255,255,255,0.3)",letterSpacing:"0.1em",textTransform:"uppercase",fontFamily:"'JetBrains Mono',monospace" }}>AI Release Analysis Platform</div>
+            <div style={{ fontFamily:"'Syne',sans-serif",fontSize:20,fontWeight:800,letterSpacing:"-0.02em" }}>Release<span style={{ color:"#00D4FF" }}>Lens</span></div>
+            <div style={{ fontSize:11,color:"rgba(255,255,255,0.38)",letterSpacing:"0.1em",textTransform:"uppercase",fontFamily:"'JetBrains Mono',monospace" }}>AI Release Analysis Platform</div>
           </div>
         </div>
-        <div style={{ display:"flex",alignItems:"center",gap:20 }}>
+        {/* Centre: badge + title — only on home */}
+        {step === "home" ? (
+          <div style={{ textAlign:"center" }}>
+            <div style={{ display:"inline-flex",alignItems:"center",gap:6,background:"rgba(0,212,255,0.08)",border:"1px solid rgba(0,212,255,0.18)",borderRadius:100,padding:"4px 13px",marginBottom:5 }}>
+              <PulsingDot color="#00D4FF" />
+              <span style={{ fontSize:10,color:"#00D4FF",fontFamily:"'JetBrains Mono',monospace",letterSpacing:"0.1em" }}>POWERED BY CLAUDE AI</span>
+            </div>
+            <div style={{ fontFamily:"'Syne',sans-serif",fontSize:18,fontWeight:800,letterSpacing:"-0.02em",lineHeight:1.15,background:"linear-gradient(135deg,#fff 0%,rgba(255,255,255,0.7) 100%)",WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent" }}>
+              Vendor Release <span style={{ background:"linear-gradient(135deg,#00D4FF,#0055FF)",WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent" }}>Intelligence</span>
+            </div>
+          </div>
+        ) : <div />}
+        {/* Right: status + actions */}
+        <div style={{ display:"flex",alignItems:"center",gap:20,justifyContent:"flex-end" }}>
           <div style={{ display:"flex",alignItems:"center",gap:7 }}>
             <PulsingDot color="#34D399" />
             <span style={{ fontSize:11,color:"#34D399",fontFamily:"'JetBrains Mono',monospace" }}>Claude AI · Live</span>
@@ -957,53 +970,52 @@ Scope: ${scopeInstruction}`;
       <div style={{ display:"flex",flex:1,position:"relative",zIndex:1,overflow:"hidden" }}>
 
         {/* ── SIDEBAR ── */}
-        <div style={{ width:228,flexShrink:0,borderRight:"1px solid rgba(255,255,255,0.055)",background:"rgba(255,255,255,0.012)",display:"flex",flexDirection:"column" }}>
-          <div style={{ padding:"20px 14px",overflow:"auto",flex:1 }}>
-            <div style={{ fontSize:10,color:"rgba(255,255,255,0.28)",letterSpacing:"0.15em",textTransform:"uppercase",fontFamily:"'JetBrains Mono',monospace",marginBottom:14 }}>Recent Analyses</div>
+        <div style={{ width:270,flexShrink:0,borderRight:"1px solid rgba(255,255,255,0.055)",background:"rgba(255,255,255,0.012)",display:"flex",flexDirection:"column" }}>
+          <div style={{ padding:"24px 18px",overflow:"auto",flex:1 }}>
+            <div style={{ fontSize:11,color:"rgba(255,255,255,0.45)",letterSpacing:"0.12em",textTransform:"uppercase",fontFamily:"'JetBrains Mono',monospace",marginBottom:16 }}>Recent Analyses</div>
             {SAMPLE_HISTORY.map(h => (
-              <div key={h.id} className="hist" style={{ padding:"10px",borderRadius:9,marginBottom:6,cursor:"pointer" }}>
-                <div style={{ fontSize:12,fontWeight:600,color:"rgba(255,255,255,0.82)",marginBottom:3,lineHeight:1.35 }}>{h.title}</div>
-                <div style={{ fontSize:10,color:"rgba(255,255,255,0.3)",fontFamily:"'JetBrains Mono',monospace",marginBottom:7 }}>{h.date}</div>
+              <div key={h.id} style={{ padding:"12px",borderRadius:10,marginBottom:8 }}>
+                <div style={{ display:"flex",alignItems:"flex-start",justifyContent:"space-between",gap:6,marginBottom:4 }}>
+                  <div style={{ fontSize:13,fontWeight:600,color:"rgba(255,255,255,0.88)",lineHeight:1.35,flex:1 }}>{h.title}</div>
+                  <a href={h.url} target="_blank" rel="noopener noreferrer"
+                    title="Open source document"
+                    style={{ flexShrink:0,marginTop:2,display:"flex",alignItems:"center",justifyContent:"center",width:22,height:22,borderRadius:6,background:"rgba(0,212,255,0.08)",border:"1px solid rgba(0,212,255,0.18)",color:"rgba(0,212,255,0.7)",textDecoration:"none",fontSize:11,transition:"all 0.15s" }}
+                    onMouseEnter={e=>{e.currentTarget.style.background="rgba(0,212,255,0.18)";e.currentTarget.style.color="#00D4FF";}}
+                    onMouseLeave={e=>{e.currentTarget.style.background="rgba(0,212,255,0.08)";e.currentTarget.style.color="rgba(0,212,255,0.7)";}}>
+                    ↗
+                  </a>
+                </div>
+                <div style={{ fontSize:11,color:"rgba(255,255,255,0.45)",fontFamily:"'JetBrains Mono',monospace",marginBottom:8 }}>{h.date}</div>
                 <div style={{ display:"flex",flexWrap:"wrap",gap:4 }}>
                   {h.scopes.slice(0,2).map(s => <span key={s} style={{ fontSize:9,padding:"2px 7px",borderRadius:4,background:"rgba(0,212,255,0.08)",color:"#00D4FF",fontFamily:"'JetBrains Mono',monospace" }}>{s.split(" ")[0]}</span>)}
                   {h.scopes.length>2 && <span style={{ fontSize:9,color:"rgba(255,255,255,0.3)" }}>+{h.scopes.length-2}</span>}
                 </div>
               </div>
             ))}
-            <div style={{ marginTop:24,padding:"14px 12px",borderRadius:10,background:"rgba(0,212,255,0.04)",border:"1px solid rgba(0,212,255,0.1)" }}>
-              <div style={{ fontSize:10,color:"#00D4FF",fontFamily:"'JetBrains Mono',monospace",marginBottom:6 }}>📊 Session</div>
-              <div style={{ fontSize:24,fontWeight:700,fontFamily:"'Syne',sans-serif",color:"white" }}>{totalFindings}</div>
-              <div style={{ fontSize:10,color:"rgba(255,255,255,0.38)",marginTop:2 }}>findings extracted</div>
+            <div style={{ marginTop:28,padding:"18px 16px",borderRadius:12,background:"rgba(0,212,255,0.04)",border:"1px solid rgba(0,212,255,0.1)" }}>
+              <div style={{ fontSize:11,color:"#00D4FF",fontFamily:"'JetBrains Mono',monospace",marginBottom:8 }}>📊 Session</div>
+              <div style={{ fontSize:32,fontWeight:700,fontFamily:"'Syne',sans-serif",color:"white" }}>{totalFindings}</div>
+              <div style={{ fontSize:12,color:"rgba(255,255,255,0.5)",marginTop:3 }}>findings extracted</div>
             </div>
           </div>
         </div>
 
         {/* ── MAIN CONTENT ── */}
-        <div style={{ flex:1,overflow:"auto",padding:"32px 40px" }}>
+        <div style={{ flex:1,overflow:"auto",padding:"40px 56px" }}>
 
           {/* ════════════ HOME ════════════ */}
           {step === "home" && (
-            <div style={{ maxWidth:680,margin:"0 auto" }}>
-              <div style={{ textAlign:"center",marginBottom:48 }}>
-                <div style={{ display:"inline-flex",alignItems:"center",gap:8,background:"rgba(0,212,255,0.08)",border:"1px solid rgba(0,212,255,0.2)",borderRadius:100,padding:"5px 16px",marginBottom:22 }}>
-                  <PulsingDot color="#00D4FF" />
-                  <span style={{ fontSize:11,color:"#00D4FF",fontFamily:"'JetBrains Mono',monospace",letterSpacing:"0.1em" }}>POWERED BY CLAUDE AI</span>
-                </div>
-                <h1 style={{ fontFamily:"'Syne',sans-serif",fontSize:44,fontWeight:800,lineHeight:1.1,letterSpacing:"-0.03em",marginBottom:14, background:"linear-gradient(135deg,#fff 0%,rgba(255,255,255,0.62) 100%)",WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent" }}>
-                  Vendor Release<br/>
-                  <span style={{ background:"linear-gradient(135deg,#00D4FF,#0055FF)",WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent" }}>Intelligence</span>
-                </h1>
-                <p style={{ color:"rgba(255,255,255,0.44)",fontSize:15,lineHeight:1.75,maxWidth:460,margin:"0 auto" }}>
-                  Upload vendor documentation or paste a URL. Choose your analysis scope. Get structured, AI-generated release intelligence in seconds.
-                </p>
-              </div>
+            <div style={{ maxWidth:780,margin:"0 auto" }}>
+              <p style={{ color:"rgba(255,255,255,0.52)",fontSize:15,lineHeight:1.7,maxWidth:560,marginBottom:36 }}>
+                Upload vendor documentation or paste a URL. Choose your analysis scope. Get structured, AI-generated release intelligence in seconds.
+              </p>
 
               {/* Step 1: Document */}
-              <div style={{ background:"rgba(255,255,255,0.028)",border:"1px solid rgba(255,255,255,0.08)",borderRadius:16,padding:28,marginBottom:18 }}>
-                <div style={{ fontSize:11,fontWeight:600,color:"rgba(255,255,255,0.38)",letterSpacing:"0.1em",textTransform:"uppercase",fontFamily:"'JetBrains Mono',monospace",marginBottom:16 }}>01 — Document Source</div>
-                <div style={{ display:"flex",gap:8,marginBottom:18 }}>
+              <div style={{ background:"rgba(255,255,255,0.032)",border:"1px solid rgba(255,255,255,0.1)",borderRadius:14,padding:"16px 18px",marginBottom:14 }}>
+                <div style={{ fontSize:11,fontWeight:700,color:"rgba(255,255,255,0.5)",letterSpacing:"0.1em",textTransform:"uppercase",fontFamily:"'JetBrains Mono',monospace",marginBottom:10 }}>01 — Document Source</div>
+                <div style={{ display:"flex",gap:8,marginBottom:10 }}>
                   {["pdf","url"].map(t => (
-                    <button key={t} onClick={()=>setDocType(t)} style={{ padding:"7px 20px",borderRadius:8,cursor:"pointer",fontFamily:"'JetBrains Mono',monospace",fontSize:11,fontWeight:600,letterSpacing:"0.08em",textTransform:"uppercase",transition:"all 0.15s ease",
+                    <button key={t} onClick={()=>setDocType(t)} style={{ padding:"5px 16px",borderRadius:7,cursor:"pointer",fontFamily:"'JetBrains Mono',monospace",fontSize:11,fontWeight:600,letterSpacing:"0.08em",textTransform:"uppercase",transition:"all 0.15s ease",
                       border: docType===t ? "1px solid rgba(0,212,255,0.5)" : "1px solid rgba(255,255,255,0.1)",
                       background: docType===t ? "rgba(0,212,255,0.1)" : "transparent",
                       color: docType===t ? "#00D4FF" : "rgba(255,255,255,0.36)" }}>
@@ -1015,15 +1027,15 @@ Scope: ${scopeInstruction}`;
                 {docType === "pdf" ? (
                   <div
                     onClick={()=>fileInputRef.current?.click()}
-                    style={{ border:"2px dashed rgba(0,212,255,0.2)",borderRadius:12,padding:"32px 20px",textAlign:"center",cursor:"pointer",background:fileName?"rgba(0,212,255,0.04)":"transparent",transition:"all 0.2s ease" }}
+                    style={{ border:"2px dashed rgba(0,212,255,0.22)",borderRadius:10,padding:"16px 16px",textAlign:"center",cursor:"pointer",background:fileName?"rgba(0,212,255,0.04)":"transparent",transition:"all 0.2s ease",display:"flex",alignItems:"center",gap:12 }}
                     onMouseEnter={e=>e.currentTarget.style.borderColor="rgba(0,212,255,0.45)"}
                     onMouseLeave={e=>e.currentTarget.style.borderColor="rgba(0,212,255,0.2)"}
                   >
                     <input ref={fileInputRef} type="file" accept=".pdf" onChange={handleFileSelect} />
                     {fileName ? (
-                      <><div style={{ fontSize:28,marginBottom:8 }}>📄</div><div style={{ color:"#00D4FF",fontSize:14,fontWeight:600,marginBottom:4 }}>{fileName}</div><div style={{ color:"rgba(255,255,255,0.3)",fontSize:11 }}>Click to change file</div></>
+                      <><div style={{ fontSize:20 }}>📄</div><div><div style={{ color:"#00D4FF",fontSize:13,fontWeight:600 }}>{fileName}</div><div style={{ color:"rgba(255,255,255,0.3)",fontSize:11 }}>Click to change</div></div></>
                     ) : (
-                      <><div style={{ fontSize:30,marginBottom:10,animation:"float 3s ease-in-out infinite" }}>⬆</div><div style={{ color:"rgba(255,255,255,0.6)",fontSize:13,marginBottom:4 }}>Click to upload PDF</div><div style={{ color:"rgba(255,255,255,0.28)",fontSize:11 }}>Deployment guides, release notes, changelogs</div></>
+                      <><div style={{ fontSize:22,animation:"float 3s ease-in-out infinite" }}>⬆</div><div style={{ textAlign:"left" }}><div style={{ color:"rgba(255,255,255,0.75)",fontSize:13 }}>Click to upload PDF</div><div style={{ color:"rgba(255,255,255,0.38)",fontSize:11 }}>Deployment guides, release notes, changelogs</div></div></>
                     )}
                   </div>
                 ) : (
@@ -1031,7 +1043,7 @@ Scope: ${scopeInstruction}`;
                     value={urlInput}
                     onChange={e=>setUrlInput(e.target.value)}
                     placeholder="https://docs.vendor.com/release-notes/v2-5…"
-                    style={{ width:"100%",background:"rgba(255,255,255,0.04)",border:"1px solid rgba(255,255,255,0.1)",borderRadius:9,padding:"13px 16px",color:"white",fontSize:13,fontFamily:"'JetBrains Mono',monospace",transition:"border-color 0.2s ease" }}
+                    style={{ width:"100%",background:"rgba(255,255,255,0.04)",border:"1px solid rgba(255,255,255,0.1)",borderRadius:8,padding:"10px 14px",color:"white",fontSize:13,fontFamily:"'JetBrains Mono',monospace",transition:"border-color 0.2s ease" }}
                     onFocus={e=>e.target.style.borderColor="rgba(0,212,255,0.5)"}
                     onBlur={e=>e.target.style.borderColor="rgba(255,255,255,0.1)"}
                   />
@@ -1039,34 +1051,34 @@ Scope: ${scopeInstruction}`;
               </div>
 
               {/* Step 2: Scope */}
-              <div style={{ background:"rgba(255,255,255,0.028)",border:"1px solid rgba(255,255,255,0.08)",borderRadius:16,padding:28,marginBottom:22 }}>
+              <div style={{ background:"rgba(255,255,255,0.032)",border:"1px solid rgba(255,255,255,0.1)",borderRadius:18,padding:34,marginBottom:24 }}>
                 <div style={{ display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:16 }}>
-                  <div style={{ fontSize:11,fontWeight:600,color:"rgba(255,255,255,0.38)",letterSpacing:"0.1em",textTransform:"uppercase",fontFamily:"'JetBrains Mono',monospace" }}>02 — Analysis Scope</div>
-                  <span style={{ fontSize:11,color:"rgba(255,255,255,0.28)" }}>{scopeList.length} selected</span>
+                  <div style={{ fontSize:12,fontWeight:700,color:"rgba(255,255,255,0.55)",letterSpacing:"0.1em",textTransform:"uppercase",fontFamily:"'JetBrains Mono',monospace" }}>02 — Analysis Scope</div>
+                  <span style={{ fontSize:12,color:"rgba(255,255,255,0.45)",fontFamily:"'JetBrains Mono',monospace" }}>{scopeList.length} selected</span>
                 </div>
-                <div style={{ display:"grid",gridTemplateColumns:"1fr 1fr",gap:8 }}>
+                <div style={{ display:"grid",gridTemplateColumns:"1fr 1fr",gap:10 }}>
                   {ANALYSIS_SCOPES.map(scope => {
                     const sel = selectedScopes.has(scope.id);
                     return (
-                      <div key={scope.id} className="scope-card" onClick={()=>toggleScope(scope.id)} style={{ display:"flex",alignItems:"center",gap:10,padding:"10px 12px",borderRadius:9,cursor:"pointer",
+                      <div key={scope.id} className="scope-card" onClick={()=>toggleScope(scope.id)} style={{ display:"flex",alignItems:"center",gap:12,padding:"14px 16px",borderRadius:10,cursor:"pointer",
                         border: sel ? `1px solid ${scope.color}44` : "1px solid rgba(255,255,255,0.06)",
                         background: sel ? `${scope.color}10` : "rgba(255,255,255,0.02)" }}>
-                        <div style={{ width:28,height:28,borderRadius:6,flexShrink:0,display:"flex",alignItems:"center",justifyContent:"center",fontSize:13,
+                        <div style={{ width:34,height:34,borderRadius:8,flexShrink:0,display:"flex",alignItems:"center",justifyContent:"center",fontSize:15,
                           background: sel ? `${scope.color}20` : "rgba(255,255,255,0.04)",
                           border: sel ? `1px solid ${scope.color}44` : "1px solid rgba(255,255,255,0.08)",
                           color: sel ? scope.color : "rgba(255,255,255,0.3)" }}>{scope.icon}</div>
-                        <span style={{ fontSize:12,fontWeight:sel?600:400,color:sel?"rgba(255,255,255,0.9)":"rgba(255,255,255,0.4)",lineHeight:1.35 }}>{scope.label}</span>
-                        {sel && <div style={{ marginLeft:"auto",width:16,height:16,borderRadius:"50%",background:scope.color,display:"flex",alignItems:"center",justifyContent:"center",fontSize:9,color:"#000",fontWeight:700 }}>✓</div>}
+                        <span style={{ fontSize:13,fontWeight:sel?600:400,color:sel?"rgba(255,255,255,0.92)":"rgba(255,255,255,0.48)",lineHeight:1.35 }}>{scope.label}</span>
+                        {sel && <div style={{ marginLeft:"auto",width:20,height:20,borderRadius:"50%",background:scope.color,display:"flex",alignItems:"center",justifyContent:"center",fontSize:10,color:"#000",fontWeight:700 }}>✓</div>}
                       </div>
                     );
                   })}
                   {/* Custom scope cards */}
                   {customScopes.map(scope => (
-                    <div key={scope.id} className="scope-card" style={{ display:"flex",alignItems:"center",gap:10,padding:"10px 12px",borderRadius:9,cursor:"default",
+                    <div key={scope.id} className="scope-card" style={{ display:"flex",alignItems:"center",gap:12,padding:"14px 16px",borderRadius:10,cursor:"default",
                       border:`1px solid ${scope.color}55`,background:`${scope.color}0e`,position:"relative" }}>
-                      <div style={{ width:28,height:28,borderRadius:6,flexShrink:0,display:"flex",alignItems:"center",justifyContent:"center",fontSize:13,
+                      <div style={{ width:34,height:34,borderRadius:8,flexShrink:0,display:"flex",alignItems:"center",justifyContent:"center",fontSize:15,
                         background:`${scope.color}22`,border:`1px solid ${scope.color}55`,color:scope.color }}>{scope.icon}</div>
-                      <span style={{ fontSize:12,fontWeight:600,color:"rgba(255,255,255,0.88)",lineHeight:1.3,flex:1,minWidth:0,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap" }}>{scope.label}</span>
+                      <span style={{ fontSize:13,fontWeight:600,color:"rgba(255,255,255,0.92)",lineHeight:1.3,flex:1,minWidth:0,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap" }}>{scope.label}</span>
                       <button onClick={()=>removeCustomScope(scope.id)}
                         style={{ flexShrink:0,width:18,height:18,borderRadius:"50%",border:"none",background:"rgba(255,255,255,0.1)",color:"rgba(255,255,255,0.5)",cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",fontSize:11,lineHeight:1,padding:0,transition:"all 0.15s" }}
                         onMouseEnter={e=>{e.currentTarget.style.background="rgba(239,68,68,0.3)";e.currentTarget.style.color="#FCA5A5";}}
@@ -1097,7 +1109,7 @@ Scope: ${scopeInstruction}`;
                     </div>
                   ) : (
                     <button onClick={()=>setShowCustomInput(true)}
-                      style={{ display:"flex",alignItems:"center",gap:6,padding:"7px 14px",borderRadius:8,border:"1px dashed rgba(255,255,255,0.15)",background:"transparent",color:"rgba(255,255,255,0.3)",fontSize:12,fontFamily:"'JetBrains Mono',monospace",cursor:"pointer",transition:"all 0.15s",width:"100%" }}
+                      style={{ display:"flex",alignItems:"center",gap:6,padding:"11px 16px",borderRadius:10,border:"1px dashed rgba(255,255,255,0.18)",background:"transparent",color:"rgba(255,255,255,0.38)",fontSize:13,fontFamily:"'JetBrains Mono',monospace",cursor:"pointer",transition:"all 0.15s",width:"100%" }}
                       onMouseEnter={e=>{e.currentTarget.style.borderColor="rgba(0,212,255,0.4)";e.currentTarget.style.color="rgba(0,212,255,0.8)";e.currentTarget.style.background="rgba(0,212,255,0.04)";}}
                       onMouseLeave={e=>{e.currentTarget.style.borderColor="rgba(255,255,255,0.15)";e.currentTarget.style.color="rgba(255,255,255,0.3)";e.currentTarget.style.background="transparent";}}>
                       <span style={{ fontSize:16,lineHeight:1,marginTop:-1 }}>+</span>
@@ -1108,9 +1120,9 @@ Scope: ${scopeInstruction}`;
               </div>
 
               {/* ── Step 03: Output Template ── */}
-              <div style={{ background:"rgba(255,255,255,0.028)",border:"1px solid rgba(255,255,255,0.08)",borderRadius:16,padding:28,marginBottom:22 }}>
+              <div style={{ background:"rgba(255,255,255,0.032)",border:"1px solid rgba(255,255,255,0.1)",borderRadius:18,padding:34,marginBottom:24 }}>
                 <div style={{ display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:14 }}>
-                  <div style={{ fontSize:11,fontWeight:600,color:"rgba(255,255,255,0.38)",letterSpacing:"0.1em",textTransform:"uppercase",fontFamily:"'JetBrains Mono',monospace" }}>03 — Output Template</div>
+                  <div style={{ fontSize:12,fontWeight:700,color:"rgba(255,255,255,0.55)",letterSpacing:"0.1em",textTransform:"uppercase",fontFamily:"'JetBrains Mono',monospace" }}>03 — Output Template</div>
                   {templateLoading ? <span style={{ fontSize:10,color:"rgba(167,139,250,0.8)",fontFamily:"'JetBrains Mono',monospace" }}>⟳ Detecting styles…</span> : null}
                 </div>
                 <div style={{ display:"flex",gap:8,alignItems:"center",flexWrap:"wrap",marginBottom:10 }}>
@@ -1139,12 +1151,12 @@ Scope: ${scopeInstruction}`;
                   <input ref={templateInputRef} type="file" accept=".docx" style={{ display:"none" }}
                     onChange={handleTemplateUpload} />
                 </div>
-                <div style={{ fontSize:11,color:"rgba(255,255,255,0.2)",lineHeight:1.6 }}>
+                <div style={{ fontSize:12,color:"rgba(255,255,255,0.38)",lineHeight:1.65 }}>
                   {customTemplate?"Your template styles have been detected and will be applied to the exported Word document.":"Uses the built-in corporate template. Upload your own .docx to apply your organisation's styles and branding."}
                 </div>
               </div>
 
-              <button className="btn-glow" onClick={()=>canRun&&setStep("confirm")} disabled={!canRun} style={{ width:"100%",padding:"16px",borderRadius:11,fontSize:14,fontWeight:700,letterSpacing:"0.05em",fontFamily:"'Syne',sans-serif",cursor:canRun?"pointer":"not-allowed",border:"none",
+              <button className="btn-glow" onClick={()=>canRun&&setStep("confirm")} disabled={!canRun} style={{ width:"100%",padding:"18px",borderRadius:13,fontSize:15,fontWeight:700,letterSpacing:"0.06em",fontFamily:"'Syne',sans-serif",cursor:canRun?"pointer":"not-allowed",border:"none",
                 background: canRun ? "linear-gradient(135deg,#00D4FF,#0055FF)" : "rgba(255,255,255,0.06)",
                 color: canRun ? "#000" : "rgba(255,255,255,0.2)",
                 boxShadow: canRun ? "0 4px 22px rgba(0,212,255,0.22)" : "none" }}>
@@ -1155,11 +1167,11 @@ Scope: ${scopeInstruction}`;
 
           {/* ════════════ CONFIRM ════════════ */}
           {step === "confirm" && (
-            <div style={{ maxWidth:640,margin:"0 auto" }}>
+            <div style={{ maxWidth:720,margin:"0 auto" }}>
               <div style={{ marginBottom:32 }}>
-                <div style={{ fontSize:11,color:"rgba(255,255,255,0.28)",fontFamily:"'JetBrains Mono',monospace",marginBottom:8 }}>READY TO ANALYZE</div>
-                <h2 style={{ fontFamily:"'Syne',sans-serif",fontSize:28,fontWeight:800,marginBottom:8 }}>Confirm Setup</h2>
-                <p style={{ color:"rgba(255,255,255,0.42)",fontSize:14 }}>Claude will analyse your document for each selected scope module sequentially.</p>
+                <div style={{ fontSize:12,color:"rgba(255,255,255,0.45)",fontFamily:"'JetBrains Mono',monospace",marginBottom:10 }}>READY TO ANALYZE</div>
+                <h2 style={{ fontFamily:"'Syne',sans-serif",fontSize:32,fontWeight:800,marginBottom:10 }}>Confirm Setup</h2>
+                <p style={{ color:"rgba(255,255,255,0.56)",fontSize:15 }}>Claude will analyse your document for each selected scope module sequentially.</p>
               </div>
               <div style={{ background:"rgba(0,212,255,0.04)",border:"1px solid rgba(0,212,255,0.14)",borderRadius:13,padding:22,marginBottom:18 }}>
                 <div style={{ fontSize:11,color:"#00D4FF",fontFamily:"'JetBrains Mono',monospace",marginBottom:12 }}>DOCUMENT</div>
@@ -1194,7 +1206,7 @@ Scope: ${scopeInstruction}`;
 
           {/* ════════════ ANALYZING ════════════ */}
           {step === "analyzing" && (
-            <div style={{ maxWidth:560,margin:"60px auto" }}>
+            <div style={{ maxWidth:640,margin:"60px auto" }}>
               {/* Spinner + phase */}
               <div style={{ textAlign:"center",marginBottom:40 }}>
                 <div style={{ width:72,height:72,borderRadius:"50%",margin:"0 auto 24px",border:"2px solid rgba(0,212,255,0.1)",borderTop:"2px solid #00D4FF",animation:"spin 1s linear infinite" }} />
@@ -1228,7 +1240,7 @@ Scope: ${scopeInstruction}`;
 
           {/* ════════════ RESULTS ════════════ */}
           {step === "results" && (
-            <div style={{ maxWidth:840,margin:"0 auto" }}>
+            <div style={{ maxWidth:960,margin:"0 auto" }}>
 
               {/* ── STICKY PROGRESS PANEL ── */}
               {(streamingId || (analysisPhase && Object.values(resultMap).some(b=>b.length===0))) && (
@@ -1318,15 +1330,15 @@ Scope: ${scopeInstruction}`;
               {!streamingId && (
                 <div style={{ display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:24,flexWrap:"wrap",gap:12 }}>
                   <div>
-                    <div style={{ fontSize:11,color:"rgba(255,255,255,0.28)",fontFamily:"'JetBrains Mono',monospace",marginBottom:6 }}>
+                    <div style={{ fontSize:12,color:"rgba(255,255,255,0.45)",fontFamily:"'JetBrains Mono',monospace",marginBottom:8 }}>
                       ANALYSIS COMPLETE · {scopeList.length} MODULES
                     </div>
-                    <h2 style={{ fontFamily:"'Syne',sans-serif",fontSize:24,fontWeight:800,marginBottom:4 }}>Release Analysis Report</h2>
-                    <div style={{ fontSize:12,color:"rgba(255,255,255,0.38)",fontStyle:"italic" }}>{fileName||urlInput}</div>
+                    <h2 style={{ fontFamily:"'Syne',sans-serif",fontSize:28,fontWeight:800,marginBottom:6 }}>Release Analysis Report</h2>
+                    <div style={{ fontSize:13,color:"rgba(255,255,255,0.52)",fontStyle:"italic" }}>{fileName||urlInput}</div>
                   </div>
                   <div style={{ display:"flex",alignItems:"center",gap:8,padding:"8px 16px",borderRadius:9,background:"rgba(52,211,153,0.07)",border:"1px solid rgba(52,211,153,0.22)" }}>
                     <PulsingDot color="#34D399" />
-                    <span style={{ fontSize:11,fontFamily:"'JetBrains Mono',monospace",color:"#34D399" }}>
+                    <span style={{ fontSize:12,fontFamily:"'JetBrains Mono',monospace",color:"#34D399" }}>
                       {totalFindings} FINDINGS READY
                     </span>
                   </div>
@@ -1334,13 +1346,13 @@ Scope: ${scopeInstruction}`;
               )}
 
               {/* ── SCOPE TABS ── */}
-              <div style={{ display:"flex",gap:6,marginBottom:22,flexWrap:"wrap" }}>
+              <div style={{ display:"flex",gap:8,marginBottom:26,flexWrap:"wrap" }}>
                 {scopeList.map(scope => {
                   const isActive   = activeScopeId === scope.id;
                   const isStreaming = streamingId === scope.id;
                   const isDone     = (resultMap[scope.id]||[]).length > 0;
                   return (
-                    <button key={scope.id} className="tab-btn" onClick={()=>setActiveScopeId(scope.id)} style={{ padding:"7px 14px",borderRadius:8,cursor:"pointer",fontSize:11,fontFamily:"'JetBrains Mono',monospace",fontWeight:600,
+                    <button key={scope.id} className="tab-btn" onClick={()=>setActiveScopeId(scope.id)} style={{ padding:"9px 18px",borderRadius:9,cursor:"pointer",fontSize:12,fontFamily:"'JetBrains Mono',monospace",fontWeight:600,
                       border: isActive ? `1px solid ${scope.color}66` : "1px solid rgba(255,255,255,0.08)",
                       background: isActive ? `${scope.color}15` : "rgba(255,255,255,0.03)",
                       color: isActive ? scope.color : isDone ? "rgba(255,255,255,0.55)" : "rgba(255,255,255,0.25)",
