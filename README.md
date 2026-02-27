@@ -1,7 +1,7 @@
 # ReleaseLens — AI Release Analysis Platform
 
 Analyse vendor documentation (PDF or URL) with Claude AI across custom scopes:
-New Features · Deprecated · Deployment Changes · Security · Breaking Changes · Migration Guide
+New Features · Deprecated · Deployment Changes · Security · Breaking Changes · Migration Guide · Custom Scope
 
 ---
 
@@ -18,7 +18,7 @@ cp .env.example .env
 
 ### 3. Build and run (one command)
 ```bash
-docker compose up --build
+ docker-compose down && docker compose up --build
 ```
 
 Open http://localhost:4173 in your browser.
@@ -61,7 +61,8 @@ release-intel/
 ├── package.json
 ├── Dockerfile         # Multi-stage build (node:20-alpine)
 ├── docker-compose.yml
-└── .env.example       # Copy to .env and add your API key
+├── .env.example       # Copy to .env and add your API key
+└── template_example.docx # Example of custom Word template 
 ```
 
 ## How the API key works
