@@ -1,7 +1,7 @@
 # ReleaseLens — Technical Documentation
 
 > AI-powered vendor release documentation analysis platform  
-> Version 1.2 · [github.com/Java4all/release-lens](https://github.com/Java4all/release-lens)
+> Version 1.4 · [github.com/Java4all/release-lens](https://github.com/Java4all/release-lens)
 
 ---
 
