@@ -29,7 +29,7 @@ const SCOPE_PROMPTS = {
     "Summarise what teams migrating from a previous version must do differently. Format EACH finding as: 'Short Area Name — Action required description — Priority' where Priority is one of: Critical, High, Medium. Example: 'Access key & PIN — Ensure only the Administrator account credentials are used, never deployment engineers — Critical'. Keep the Area Name short (2-5 words).",
 };
 
-const APP_VERSION = "1.3";
+const APP_VERSION = "1.4";
 const GITHUB_URL  = "https://github.com/Java4all/release-lens";
 
 const SAMPLE_HISTORY = [
