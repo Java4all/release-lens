@@ -29,6 +29,9 @@ const SCOPE_PROMPTS = {
     "Summarise what teams migrating from a previous version must do differently. Format EACH finding as: 'Short Area Name — Action required description — Priority' where Priority is one of: Critical, High, Medium. Example: 'Access key & PIN — Ensure only the Administrator account credentials are used, never deployment engineers — Critical'. Keep the Area Name short (2-5 words).",
 };
 
+const APP_VERSION = "1.3";
+const GITHUB_URL  = "https://github.com/Java4all/release-lens";
+
 const SAMPLE_HISTORY = [
   { id: 1, title: "Dell DAP 1.x Deployment Guide",    date: "Feb 2026", url: "https://www.dell.com/support/kbdoc/en-us/000224359/dell-apex-software-platform-deployment-guide", scopes: ["New & Changed Features", "Deprecated Features", "Deployment Changes"] },
   { id: 2, title: "VMware vSphere 8.0 Release Notes", date: "Jan 2026", url: "https://docs.vmware.com/en/VMware-vSphere/8.0/rn/vmware-vsphere-80-release-notes/index.html", scopes: ["Breaking Changes", "Security & Compliance"] },
@@ -935,11 +938,20 @@ Scope: ${scopeInstruction}`;
 
       {/* ── TOP BAR ── */}
       <div style={{ position:"relative",zIndex:10,display:"grid",gridTemplateColumns:"1fr auto 1fr",alignItems:"center",padding:"16px 36px",borderBottom:"1px solid rgba(255,255,255,0.06)",background:"rgba(7,11,20,0.85)",backdropFilter:"blur(20px)" }}>
-        {/* Left: Logo */}
+        {/* Left: Logo + version */}
         <div style={{ display:"flex",alignItems:"center",gap:12 }}>
           <div style={{ width:42,height:42,borderRadius:11,background:"linear-gradient(135deg,#00D4FF,#0055FF)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:22,color:"#000",fontWeight:800 }}>⟐</div>
           <div>
-            <div style={{ fontFamily:"'Syne',sans-serif",fontSize:20,fontWeight:800,letterSpacing:"-0.02em" }}>Release<span style={{ color:"#00D4FF" }}>Lens</span></div>
+            <div style={{ display:"flex",alignItems:"center",gap:8 }}>
+              <div style={{ fontFamily:"'Syne',sans-serif",fontSize:20,fontWeight:800,letterSpacing:"-0.02em" }}>Release<span style={{ color:"#00D4FF" }}>Lens</span></div>
+              <a href={GITHUB_URL} target="_blank" rel="noopener noreferrer"
+                title={`v${APP_VERSION} · Open source on GitHub`}
+                style={{ display:"inline-flex",alignItems:"center",gap:4,padding:"2px 8px",borderRadius:5,background:"rgba(0,212,255,0.08)",border:"1px solid rgba(0,212,255,0.2)",color:"rgba(0,212,255,0.7)",fontSize:10,fontFamily:"'JetBrains Mono',monospace",fontWeight:700,textDecoration:"none",letterSpacing:"0.05em",transition:"all 0.15s",lineHeight:1.4 }}
+                onMouseEnter={e=>{e.currentTarget.style.background="rgba(0,212,255,0.16)";e.currentTarget.style.color="#00D4FF";e.currentTarget.style.borderColor="rgba(0,212,255,0.45)";}}
+                onMouseLeave={e=>{e.currentTarget.style.background="rgba(0,212,255,0.08)";e.currentTarget.style.color="rgba(0,212,255,0.7)";e.currentTarget.style.borderColor="rgba(0,212,255,0.2)";}}>
+                v{APP_VERSION} ↗
+              </a>
+            </div>
             <div style={{ fontSize:11,color:"rgba(255,255,255,0.38)",letterSpacing:"0.1em",textTransform:"uppercase",fontFamily:"'JetBrains Mono',monospace" }}>AI Release Analysis Platform</div>
           </div>
         </div>
@@ -996,6 +1008,37 @@ Scope: ${scopeInstruction}`;
               <div style={{ fontSize:11,color:"#00D4FF",fontFamily:"'JetBrains Mono',monospace",marginBottom:8 }}>📊 Session</div>
               <div style={{ fontSize:32,fontWeight:700,fontFamily:"'Syne',sans-serif",color:"white" }}>{totalFindings}</div>
               <div style={{ fontSize:12,color:"rgba(255,255,255,0.5)",marginTop:3 }}>findings extracted</div>
+            </div>
+
+            {/* Credits */}
+            <div style={{ padding:"14px 18px",borderTop:"1px solid rgba(255,255,255,0.05)" }}>
+              <div style={{ fontSize:10,color:"rgba(255,255,255,0.22)",lineHeight:1.7,fontFamily:"'JetBrains Mono',monospace" }}>
+                <div style={{ marginBottom:4 }}>
+                  Built by{" "}
+                  <a href={GITHUB_URL} target="_blank" rel="noopener noreferrer"
+                    style={{ color:"rgba(0,212,255,0.55)",textDecoration:"none",transition:"color 0.15s" }}
+                    onMouseEnter={e=>e.currentTarget.style.color="#00D4FF"}
+                    onMouseLeave={e=>e.currentTarget.style.color="rgba(0,212,255,0.55)"}>
+                    Java4all
+                  </a>
+                </div>
+                <div style={{ marginBottom:4,color:"rgba(255,255,255,0.18)" }}>
+                  Idea & requirements by owner<br/>
+                  Code by{" "}
+                  <a href="https://claude.ai" target="_blank" rel="noopener noreferrer"
+                    style={{ color:"rgba(167,139,250,0.55)",textDecoration:"none",transition:"color 0.15s" }}
+                    onMouseEnter={e=>e.currentTarget.style.color="#A78BFA"}
+                    onMouseLeave={e=>e.currentTarget.style.color="rgba(167,139,250,0.55)"}>
+                    Claude AI
+                  </a>
+                </div>
+                <a href={GITHUB_URL} target="_blank" rel="noopener noreferrer"
+                  style={{ display:"inline-flex",alignItems:"center",gap:4,color:"rgba(255,255,255,0.2)",textDecoration:"none",transition:"color 0.15s",fontSize:10 }}
+                  onMouseEnter={e=>e.currentTarget.style.color="rgba(255,255,255,0.5)"}
+                  onMouseLeave={e=>e.currentTarget.style.color="rgba(255,255,255,0.2)"}>
+                  ⎇ Open source · MIT
+                </a>
+              </div>
             </div>
           </div>
         </div>
